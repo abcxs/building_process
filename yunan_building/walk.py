@@ -1,6 +1,8 @@
 import os
 import random
+
 from utils import json_dump
+
 
 def walk(cfg):
     input_dir = cfg.input_dir
@@ -10,7 +12,6 @@ def walk(cfg):
 
     random.seed(seed)
     files = {}
-    id_ = 0
 
     l1s = os.listdir(input_dir)
     for l1 in l1s:
@@ -18,15 +19,15 @@ def walk(cfg):
             result = walk_and_check(os.path.join(input_dir, l1))
             if result is None:
                 continue
-            result['id'] = id_
-            id_ += 1
             if 'background' in l1:
                 result['ann'] = []
                 result['background'] = True
             else:
                 result['background'] = False
             files[os.path.join(input_dir, l1)] = result
-
+    files = dict(sorted(files.items()))
+    for i, file in enumerate(files.values()):
+        file['id'] = i
     ids = [data['id'] for data in files.values() if not data['background']]
     val_ids = random.sample(ids, int(len(ids) * (1 - percent)))
     for data in files.values():

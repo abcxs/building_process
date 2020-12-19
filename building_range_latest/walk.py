@@ -1,8 +1,17 @@
 
+import json
 import os
 import random
-import json
+
 from utils import json_dump
+
+
+def walk_data_root(input_dir, background=False):
+    files = {}
+    result = walk_and_check(input_dir, background)
+    if result is not None:
+        files[input_dir] = result
+    return files
 
 def walk_data_one_layer(input_dir, background=False):
     files = {}
@@ -55,7 +64,7 @@ def walk(cfg):
             elif site in background_two_layer:
                 walk_background = walk_data_two_layer
             else:
-                raise ValueError('if {0} have background, {0} should in background_one_layer or background_two_layer'.format(site))
+                walk_background = walk_data_root
             result_files = walk_background(os.path.join(input_dir, l1), background=True)
             for result_file in result_files.values():
                 result_file['background'] = True
@@ -69,7 +78,7 @@ def walk(cfg):
             for result_file in result_files.values():
                 result_file['background'] = False
             files.update(result_files)
-    
+    files = dict(sorted(files.items()))
     for i, file in enumerate(files.values()):
         file['id'] = i
     
@@ -117,5 +126,5 @@ def walk_and_check(path, background=False):
         print('skip %s, it have %d tif, %d shp, %d fw' % (path, len(result_file['tif']), len(result_file['shp']), len(result_file['fw'])))
 
 if __name__ == '__main__':
-    import mytools.building_range_latest.cfg as cfg
+    import cfg
     walk(cfg)

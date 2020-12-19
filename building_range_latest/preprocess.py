@@ -67,7 +67,6 @@ def preprocess(cfg):
 
 
 def process(process_id, files, output_dir, convert_results):
-    
     for k, v in files.items():
         id_ = v['id']
         tif_files = v['tif']
@@ -94,7 +93,10 @@ def process(process_id, files, output_dir, convert_results):
 
         for tif_file in tif_files:
             for fw_file in fw_files:
-                infos, cur_id = crop(tif_file, fw_file, output_dir, id_, cur_id)
+                try:
+                    infos, cur_id = crop(tif_file, fw_file, output_dir, id_, cur_id)
+                except Exception:
+                    continue
                 if infos is None or len(infos) == 0:
                     continue
                 for shp_file in shp_files:
